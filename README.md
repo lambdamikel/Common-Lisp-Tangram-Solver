@@ -27,7 +27,7 @@ following problem:
 ![editor1](pics/editor1.png)
 ![editor2](pics/editor2.png)
 ![thinking](pics/showthinking.png)
-![solutions](pics/editor.png)
+![solutions](pics/editor.jpg)
 
 A YouTube video showing the solver in action will be published soon.
 
