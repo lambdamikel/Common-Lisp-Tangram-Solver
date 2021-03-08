@@ -5,7 +5,9 @@ A Tangram Puzzle Solver in Common Lisp that is capable of solving arbitrary geom
 
 This was writting in Common Lisp in 2003, using CLIM for the GUI (Common Lisp Interface Manager). It compiles with LispWorks 6.1 & CLIM. 
 
-Here is a [2003 poster about the project, in German](http://kicad-pcb.org/). 
+Here is a [2003 poster about the project, in German](tangram-poster.pdf). 
+
+![poster](pics/poster.jpg)
 
 In to 2021, the code was resurrected and some major bugs were fixed
 that previously caused the solver to be very incomplete. I was intruiged to find that I was still able to run 2003 CLIM applications, but it required me to install a number of 32bit legacy libraries (32bit Motif etc.) 
