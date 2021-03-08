@@ -1,11 +1,10 @@
 # Common-Lisp-Tangram-Solver
-A Tangram Puzzle Solver in Common Lisp that is capable of solving arbitrary geometric tiling problems
+A Tangram Puzzle Solver in Common Lisp that is capable of solving arbitrary geometric tiling problems, utilizing CLIM (Common Lisp Interface Manager) for its GUI. 
 
 ![tiles](pics/tiles.png)
 
-This was written in Common Lisp in 2003, using CLIM for the GUI
-(Common Lisp Interface Manager). It compiles with LispWorks 6.1 &
-CLIM.
+This was written in Common Lisp in 2003, using CLIM (Common Lisp
+Interface Manager) for the GUI. It compiles with LispWorks 6.1 & CLIM.
 
 Here is a [2003 poster about the project, in German](tangram-poster.pdf). 
 
