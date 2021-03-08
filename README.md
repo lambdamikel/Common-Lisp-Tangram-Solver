@@ -15,10 +15,10 @@ In 2021 I resurrected the code and fixed some major bugs that were
 responsible for some severe incompleteness. It is performing much
 better now!
 
-I was intruiged to find that I was still able to run CLIM application
-from 2003 in 2021, but it required me to install a number of 32bit
-legacy libraries (32bit Motif etc.) to get is going again on my
-64bit Ubuntu Xenial PC. 
+I was intruiged to find that I was still able to run a CLIM
+application from 2003 in 2021, but it required me to install a number
+of 32bit legacy libraries (32bit Motif etc.) to get is going again on
+my 64bit Ubuntu Xenial PC.
 
 On my 2012 iCore 7 2.4 GZ 8 GB Ubuntu Xenial PC, thanks to its
 geometric heuristics, it takes ~ 3 minutes and 54 seconds to solve the
