@@ -1344,7 +1344,7 @@
 					     :clear-p t)
 
                            ;;; draw only one from each set of congruent tiles (first)
-			   (draw-given-tiles (mapcar #'first tiles)
+			   (draw-given-tiles (mapcar #'(lambda (x) (first (ensure-list x)))  tiles)
 					     :clear-p t)
 
 			   
@@ -1496,7 +1496,8 @@
 	                         (make-tile 'd '((80 0) (80 40) (60 20) (80 0)) +blue+)
 	                         (make-tile 'e '((20 60) (60 60) (40 40) (20 60)) +black+)   
 	                         (make-tile 'f '((60 20) (80 40) (60 60) (40 40) (60 20)) +cyan+)
-	                         (make-tile 'g '((0 80) (40 80) (60 60) (20 60) (0 80)) +magenta+))
+	                         (make-tile 'g '((0 80) (40 80) (60 60) (20 60) (0 80)) +magenta+
+                                            :mirror-values '((1 1) (-1 1) (1 -1) (-1 -1))))
 
               #+:ignore 
 	      (make-tangram-set 

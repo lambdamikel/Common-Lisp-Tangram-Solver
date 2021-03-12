@@ -3,6 +3,8 @@ A Tangram Puzzle Solver in Common Lisp that is capable of solving arbitrary geom
 
 ![tiles](pics/tiles.png)
 
+Check out [the YouTube video to see it in action!](https://www.youtube.com/watch?v=UUn_np8I3zg) 
+
 This was written in Common Lisp in 2003, using CLIM (Common Lisp
 Interface Manager) for the GUI. It compiles with LispWorks 6.1 & CLIM.
 

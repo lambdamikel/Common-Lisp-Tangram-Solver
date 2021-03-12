@@ -372,149 +372,6 @@
       res)))
 
 
-#|
-(defun find-covering (polygon-set tile-types &key (remove-used-tiles-p t)
-                                  frame 
-                                  all-solutions-p                                  
-                                  allow-less-tiles-p                      
-                                  show-thinking-fn)
-
-  ;; these are lists of equivalent tiles! 
-  #+:ignore
-  (when (some #'cdr tile-types)
-    (error "Bad tiles!"))
-      
-
-  (let* ((tile-types (apply #'append tile-types))
-         (solutions nil)
-         (orig-tile-types (copy-list tile-types)))
-
-    (labels ((goal-p (polygons rem-tiles) 
-               (and (not polygons)
-                    (or allow-less-tiles-p
-                        (not rem-tiles))))
-
-             (do-it (polygons rem-tiles history)
-                 
-               (cond ((goal-p polygons rem-tiles) 
-
-                      (push (list polygons rem-tiles history) solutions)
-
-                      (when show-thinking-fn (funcall show-thinking-fn polygons rem-tiles history t))
-
-                      (unless all-solutions-p 
-                        (return-from do-it nil)))
-
-                     (t 
-			
-                      (when show-thinking-fn (funcall show-thinking-fn polygons rem-tiles history nil))
-
-                      (let* (;; first, determine next polygon per heuristics: 
-                             (polygons (sort polygons
-                                             #'>
-                                             :key #'(lambda (polygon)
-                                                      (polygon-selection-heuristic polygon))))
-                             (res nil))
-			  
-                        (dolist (polygon polygons)
-
-                          ;; next, determine order of sequence in which tiles from the type (= set of tiles) are tried 
-                          (let* ((tiles
-                                  (sort rem-tiles 
-                                        #'>
-                                        :key #'(lambda (tile)
-                                                 (tile-selection-heuristic-for-polygons tile polygon))))
-                                 
-                                 (res nil))
-                            
-                            (dolist (tile tiles)
-                                
-                              (when (<= (tangram-geometry::calculate-area (shape tile))
-                                        (tangram-geometry::calculate-area polygon))
-                                
-                                (let* ((possible-alignments
-                                        (find-possible-alignments polygon (shape tile)
-                                                                  :frame frame :color (color tile))))
-                                  
-                                  (push (list possible-alignments polygon tile) res))))))
-                        
-                        
-                        (setf res (sort res #'> :key #'alignment-score))
-                        
-                        (loop as (possible-alignments polygon tile) in res do
-
-                              (let ((sorted
-                                     ;; next, determine which of the possible alignments to pursue next
-                                     (sort possible-alignments 
-                                           #'> 
-                                           :key #'(lambda (conf)
-                                                    (alignment-result-heuristic-for-polygon conf polygon))))
-                                    (rem-polygons (remove polygon polygons)))
-
-                                (dolist (possible-alignment sorted)
-                                  (let ((polygon-set (first possible-alignment))
-                                        (aligned-polygon (second possible-alignment)))
-                                              
-                                    (when polygon-set                                      
-                                      (do-it (if (eq polygon-set :match)
-                                                 rem-polygons 
-                                               (append rem-polygons polygon-set))
-                                             (if remove-used-tiles-p 
-                                                 (remove tile rem-tiles)
-                                               rem-tiles)
-                                             (cons (list aligned-polygon tile) history))))))))))))
-      
-      (do-it polygon-set tile-types nil)
-      
-      solutions)))
-
-;;;
-;;;
-;;;
-
-(defun polygon-selection-heuristic (polygon)
-  ;; give precedence to bigger polygons 
-  (tangram-geometry::calculate-area polygon))
-
-
-(defun alignment-score (alignment)
-  ;; determine which successor conf to determine next
-  (let ((align (first alignment))
-        (rem-polygons (second alignment))
-        (tile (third alignment)))
-    (let ((polygon-set (first align))
-          (aligned-polygon (second align)))
-      (if (eq polygon-set :match)
-          1000
-        (- 999 (length rem-polygons))))))
-
-
-(defun alignment-result-heuristic-for-polygon (conf orig-polygon)
-  ;; determine which successor conf to determine next
-  (let* ((remaining-polygon-set (first conf))         
-         (aligned-polygon (second conf))
-         (rem-area (reduce #'+ (mapcar #'tangram-geometry::calculate-area remaining-polygon-set))))
-    #+:ignore
-    (apply #'+
-           (mapcar #'compactness
-                   remaining-polygon-set))
-    rem-area))
-
-
-(defun tile-selection-heuristic-for-polygon (tile polygon)
-  ;; biggest tiles first 
-  (- 10 (position (name tile)
-                  '(a b c d e f g))))
-
-|# 
-
-#|
-(defun tile-selection-heuristic-for-polygon (tile polygon)
-  ;; biggest tiles first 
-  (- (tangram-geometry::calculate-area polygon)
-     (tangram-geometry::calculate-area (shape tile))))
-|# 
-
 ;;;
 ;;;
 ;;;
@@ -542,9 +399,6 @@
                     (or allow-less-tiles-p
                         (not tile-types))))
 
-             (bad-configuration-p (polygons tile-types)
-               nil)
-
              (do-it (polygons tile-types history)
                  
                (cond ((goal-p polygons tile-types) 
@@ -556,8 +410,6 @@
                       (unless all-solutions-p 
                         (return-from do-it nil)))
 
-                     ((bad-configuration-p polygons tile-types)
-                      nil)
 		       
                      (t 
 			
@@ -566,66 +418,44 @@
                       #+:ignore 
                       (sleep 1) 
 
-                      (let* ((orig-types (copy-list tile-types))
+                      (let* ((alignments nil))
+			                          
+                        (dolist (polygon polygons)
+                          (dolist (tile-type tile-types) ; tile-type is the set of "mirrored" versions of that tile! defined by means of the "mirror values" for the tile 
+                            (dolist (tile tile-type)
+                              (when t #+:ignore 
+                                (<=  (tangram-geometry::calculate-area (shape tile))
+                                         (tangram-geometry::calculate-area polygon))
 
-                             ;; first, determine next polygon per heuristics: 
-                             #+:ignore
-                             (polygons (sort polygons
-                                             #'<
-                                             :key #'(lambda (polygon)
-                                                      (polygon-selection-heuristic polygon))))
-                             ;; determine tile type (list of list of congruent tiles -> (first tile) 
-                             #+:ignore
-                             (tile-types 
-                              (sort tile-types 
-                                    #'>
-                                    :key #'(lambda (tile)
-                                             (tile-selection-heuristic-for-polygons (first tile) polygons))))
+                                (dolist (alignment
+                                         (find-possible-alignments polygon (shape tile)
+                                                                   :frame frame :color (color tile)))
+                                  (let ((h                                   
+                                         (alignment-result-heuristic-for-polygon alignment polygon)))
 
-                             )
-			  
-                        ;;(princ tile-types) (break "~S" tile-types)
-                        (loop while tile-types do
-                              (dolist (polygon polygons)
-                                (let* ((tile-type (first tile-types))) ; only try one congruent tile from each class (list of list of congruent tiles) 
-                                  (dolist (tile tile-type)
+                                    (push (list h polygon tile tile-type alignment) 
+                                          alignments)))))))
 
-                                    (when t
-                                      ;; this DOES not work, then certain problem cannot be found!
-                                      ;; for example, 45 degree rotated yellow 
-                                      #+:ignore
-                                      (<=  (tangram-geometry::calculate-area (shape tile))
-                                           (tangram-geometry::calculate-area polygon))
-
-                                      (let* ((possible-alignments
-                                              (find-possible-alignments polygon (shape tile)
-                                                                        :frame frame :color (color tile)))
-                                             (rem-polygons (remove polygon polygons))
-                                             (sorted possible-alignments)
-                                             
-                                             #+:ignore
-                                             (sorted
-                                              ;; next, determine which of the possible alignments to pursue next
-                                              (sort possible-alignments 
-                                                    #'> 
-                                                    :key #'(lambda (conf)
-                                                             (alignment-result-heuristic-for-polygon conf polygon)))))
-                                          
-                                        (dolist (possible-alignment sorted)
-
-                                          (let ((polygon-set (first possible-alignment))
-                                                (aligned-polygon (second possible-alignment)))
+                        (let ((sorted (subseq (sort alignments #'> :key #'first) 0 (min 100 (length alignments)))))
+                          (loop as (h polygon tile tile-type alignment) in sorted do        
+                                  (let* (
+                                         ;; note - if one mirrored version of a tile is used from the tile-type, then we cannot use any other mirrored version
+                                         ;; hence, if reuse it not permitted, remove the ENTIRE tile type as one of its variants was used 
+                                         ;; the actual tiles doesn't matter hence! only the tile-type! 
+                                         (new-tile-types (remove tile-type tile-types))
+                                         (rem-polygons (remove polygon polygons))
+                                      
+                                         (polygon-set (first alignment))
+                                         (aligned-polygon (second alignment)))
                                               
-                                            (when polygon-set                                      
-                                              (do-it (if (eq polygon-set :match)
-                                                         rem-polygons 
-                                                       (append rem-polygons polygon-set))
-                                                     (if remove-used-tiles-p 
-                                                         (remove tile-type orig-types)
-                                                       orig-types)
-                                                     (cons (list aligned-polygon tile) history))))))))))
-                                  
-                              (setf tile-types (rest tile-types))))))))
+                                    (when polygon-set                                 
+                                      (do-it (if (eq polygon-set :match)
+                                                 rem-polygons 
+                                               (append rem-polygons polygon-set))
+                                             (if remove-used-tiles-p 
+                                                 new-tile-types
+                                               tile-types)
+                                             (cons (list aligned-polygon tile) history)))))))))))
       
       (do-it polygon-set tile-types nil)
       
@@ -636,32 +466,38 @@
 ;;;
 ;;;
 
-(defun polygon-selection-heuristic (polygon)
-  ;; give precedence to bigger polygons 
-  (- (tangram-geometry::calculate-area polygon)))
+(defun alignment-result-heuristic-for-polygon (conf orig-polygon)
+  (let* ((remaining-polygon-set (first conf))         
+         (aligned-polygon (second conf))
+         ;(rem-area (reduce #'+ (mapcar #'tangram-geometry::calculate-area remaining-polygon-set)))
+         (h
+          (if (symbolp remaining-polygon-set) ; :match! 
+              (return-from alignment-result-heuristic-for-polygon 100000)
+            (apply #'+
+                   (mapcar #'compactness
+                           remaining-polygon-set))))
+         (count 0))
+
+    (loop as s in (segments aligned-polygon) do
+          (when (lies-on-p s orig-polygon)
+            (incf count (length-of-line s))))
+
+    (* (1+ count) h)))
 
 
+#+:ignore
 (defun alignment-result-heuristic-for-polygon (conf orig-polygon)
   ;; determine which successor conf to determine next
   (let* ((remaining-polygon-set (first conf))         
          (aligned-polygon (second conf))
-         (rem-area (reduce #'+ (mapcar #'tangram-geometry::calculate-area remaining-polygon-set))))
-    (- (apply #'+
-           (mapcar #'compactness
-                   remaining-polygon-set)))
+         (rem-area (reduce #'+ (mapcar #'tangram-geometry::calculate-area remaining-polygon-set)))
+         (h
+          (- (apply #'+
+                    (mapcar #'compactness
+                            remaining-polygon-set)))))
     ; rem-area
+    h
     ))
 
 
-(defun tile-selection-heuristic-for-polygons (tile polygons)
-  ;; biggest tiles first 
-  (- 10 (position (name tile)
-                  '(a b c d e f g))))
 
-
-#|
-(defun tile-selection-heuristic-for-polygon (tile polygon)
-  ;; biggest tiles first 
-  (- (tangram-geometry::calculate-area polygon)
-     (tangram-geometry::calculate-area (shape tile))))
-|# 
