@@ -30,13 +30,13 @@ following problem:
 ![thinking](pics/showthinking.png)
 ![solutions](pics/editor.jpg)
 
-A YouTube video showing the solver in action will be published soon.
-
 AFAIK, this is the only Tangram solver in existence (there are very
 few out there!) capable of solving arbitary geometric tiling problems
 purely by means of geometrical search / computational geometry. 
 
 ![search](pics/search.jpg)
+
+[Check out the YouTube video to see it in action!](https://www.youtube.com/watch?v=UUn_np8I3zg) 
 
 The geometric substrate support functions were also written by the
 author, as part of his computer science master and PhD endeavors from
