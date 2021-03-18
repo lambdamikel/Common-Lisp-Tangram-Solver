@@ -6,18 +6,22 @@ A Tangram Puzzle Solver in Common Lisp that is capable of solving arbitrary geom
 ## About 
 
 This was written in Common Lisp in 2003, using CLIM (Common Lisp
-Interface Manager) for the GUI. It compiles with LispWorks 6.1 & CLIM,
-on Windows and Linux.
+Interface Manager) for its GUI. It compiles with LispWorks 6.1 and 7.1
+with CLIM, on Windows, Linux, and Mac. I can only support Windows and
+Linux, but it is known to run on a M1 Silicon Mac as well (see below).
 
-Here is a [2003 poster about the project, in German](tangram-poster.pdf). 
+Here is a [2003 poster about the project, in
+German](tangram-poster.pdf).
 
 ![poster](pics/poster.jpg)
 
-Check out [the YouTube video to see it in action!](https://www.youtube.com/watch?v=UUn_np8I3zg) 
+Pleae check out [the YouTube video to see it in
+action!](https://www.youtube.com/watch?v=UUn_np8I3zg), or try
+one of the supplied executables to run on your own machine! 
 
 On my 2012 iCore 7 2.4 GZ 8 GB Ubuntu Xenial PC, thanks to its
-geometric heuristics, it takes ~ 10 seconds to solve the following
-problem:
+geometric search heuristics, it takes ~ 10 seconds to solve the
+following problem:
 
 ![editor1](pics/editor1.png)
 ![editor2](pics/editor2.png)
@@ -25,46 +29,46 @@ problem:
 ![solutions](pics/editor.jpg)
 
 AFAIK, this is the only Tangram solver in existence (there are very
-few out there!) capable of solving arbitary geometric tiling problems
-purely by means of geometrical search / computational geometry. 
+few out there!) that is capable of solving arbitary geometric tiling
+problems purely by means of geometric search / computational
+geometry.
 
 ![search](pics/search.jpg)
 
 ## History 
 
-I resurrected the code in March 2021 and fixed some major bugs that
-were responsible for severe incompleteness. It is performing much
-better by now!
+The program was written in 2003. I resurrected the code in March 2021
+and fixed some major bugs that were responsible for severe 
+incompleteness. It is performing much better by now!
 
 The geometric substrate support functions were written by the author
 during his computer science master and PhD endeavors, from 1996 to
-2003. The Tangram solver was written in 2003.
-
+2003.
 
 ## Installation (Windows, Linux, Mac)
 
 You will need LisWorks (6.1, 7.1) with CLIM if you want to run it from
-source (or even build the application). Else, exectuables for Linux32
-and Windows are provided in this repository (see below).
+source, or even build the application. Else, exectuables are provided
+for Linux32 and Windows (see below).
 
 On Linux, I needed to install a number of (in my case, 32bit) legacy
 libraries, like (32bit) Motif etc. in order to get is going. It is
-more straightforward on Windows (tested on 64bit Windows 10).  
+much more straightforward with Windows (tested on 64bit Windows 10).
 
-The well-known Lisp hacker `Lispm` (Rainer Joswig) also reported that
-it runs on an Apple Silicon Mac with M1 processor under 64bit ARM
+The well-known Lisp hacker `Lispm` (Rainer Joswig) reported that [it
+runs fine on an Apple Silicon Mac with M1 processor under 64bit ARM
 Linux.](https://twitter.com/RainerJoswig/status/1369401013308973060).
-Contact Rainer for details (I don't have a Mac).
 
 ## Executables 
 
-There are [executables provided for Linux32 and Windows.](./builds/) 
+Here are the [provided executables for Linux32 and
+Windows.](./builds/)
 
 ## Loading / Usage 
 
-If you want to run it from source, check out the
+If you want to build it from source, check out the
 [`src/tangram-sysdcl.lisp`](./src/tangram-sysdcl.lisp).  Adjust the
-logical "tangram" pathname to match your environment. Then, as shown
+logical `"tangram"` pathname to match your environment. Then, as shown
 at the end of the file, do a
 
 ```
@@ -74,13 +78,13 @@ at the end of the file, do a
 
 ``` 
 
-There are also [`deliver.lisp`](src/deliver.lisp) scripts for
+There are also [`deliver.lisp`](src/deliver.lisp) scripts provided for
 [Linux32](build-tangram-lw61.sh) and
-[Windows](build-tangram-lw61.bat). 
+[Windows](build-tangram-lw61.bat).
 
 For the Mac, you'll probably have to collect the "FLI Templates", and
 then change the [`tangram-sysdcl.lisp`](./src/tangram-sysdcl.lisp)
-accordingly:
+accordingly: 
 
 ```
 (define-system tangram
@@ -92,11 +96,20 @@ accordingly:
    tangram-main tangram-gui))
 ```
 
-The process of "FLI Template" collection is described [in the
+The process of "FLI template collection" is described [in the
 LispWorks
 manual.](http://www.lispworks.com/documentation/lw71/DV/html/delivery-167.htm)
 
-Or, contact Lisp hacker `Lispm` (Rainer Joswig) who got deliver to
-work with an Apple Silicon Mac with M1 processor under 64bit ARM
+Lisp hacker `Lispm` (Rainer Joswig) has [successfully delivered the
+application with his Apple Silicon Mac with M1 processor under 64bit ARM
 Linux.](https://twitter.com/RainerJoswig/status/1369401013308973060).
+
+# Acknowledgements
+
+Thanks to Rainer Joswig (`Lispm`) for checking it out with the new
+Silicon Macs and LispWorks 7.1 (I only have 6.1), for spreading the
+word, and for tipps regarding the application delivery process (FLI
+template collection).
+
+Enjoy! 
 
