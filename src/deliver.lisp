@@ -4,32 +4,41 @@
 
 (load-all-patches)
 
-#+win32 
-(progn 
-  (defconstant +tangram+ "c:/mwessel/tangram/")
-  (load (format nil "~A~A" +home+ "define-system.lisp")))
+#+:mswindows
+(setf (logical-pathname-translations "tangram")
+      '(("**;*.*" "C:\\Users\\Michael\\Desktop\\Tangram\\src\\**\\*.*")))
 
-#-win32
-(progn 
-  (defconstant +tangram+ "~mwessel/lispworks/work/tangram/"))
+#-:mswindows
+(setf (logical-pathname-translations "tangram")
+      '(("**;*.*" "/home/mwessel/tangram/src/**/*.*")))
+
+;;;
+;;;
+;;;
+
+(require "clim") 
+
+(load "tangram:define-system.lisp")
+(load "tangram:tangram-sysdcl.lisp")
+
   
 (defun csys (system &rest args)
   (apply #'compile-system system args)
   (apply #'load-system system args))
   
-
-(progn 
-  (setf (logical-pathname-translations "tangram")
-        (list `("**;*.*" ,(format nil "~A~A" +tangram+ "**/*.*"))))
-  (load "tangram:tangram-sysdcl.lisp"))
-
 (csys "tangram" :force-p t)
 
 (deliver 'tangram::tangram 
-         #+:linux "~/temp/tangram.exe"
+         #-:mswindows
+         "/home/mwessel/temp/tangram"
+         #+:mswindows         
+         "c:\\temp\\tangram.exe"
          4
-         :console t
-         :interface :capi)
-
+	:packages-to-keep 
+	'(tangram-geometry tangram-persistence-manager cl-user tangram)
+	:interface :capi 
+	:multiprocessing t
+	)
 
 (quit)
+

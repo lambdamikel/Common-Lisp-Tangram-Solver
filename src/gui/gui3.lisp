@@ -493,6 +493,7 @@
       (6/10
        (horizontally ()
          (3/4 
+          #-:mswindows
           (vertically ()
             (1/20 up-button)
             (18/20 
@@ -500,7 +501,9 @@
                (1/20 left-button)
                (18/20 (outlining () display))
                (1/20 right-button)))
-            (1/20 down-button)))
+            (1/20 down-button))
+          #+:mswindows
+          (outlining () display))
          (1/4 (outlining () 
                 (vertically ()
                   (1/4 options)
@@ -1520,13 +1523,23 @@
 		          (make-rgb-color 1 0.3 0.9)
 			  :mirror-values '((1 1) (-1 1) (1 -1) (-1 -1))))
 	      ))
+
   (setf *tangram-frame*
+        #-:mswindows
         (make-application-frame
             'tangram-frame          
           :left 40 
           :top 40 
           :width 900 
-          :height 950))
+          :height 950)
+        #+:mswindows
+        (make-application-frame
+            'tangram-frame          
+          :left 40 
+          :top 40 
+          :width 800 
+          :height 750))
+
   (setf (current-set *tangram-frame*)
         (first (all-sets *tangram-frame*)))
 

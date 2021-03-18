@@ -2,6 +2,25 @@
  
 (in-package :cl-user)
 
+#+:mswindows
+(setf (logical-pathname-translations "tangram")
+      '(("**;*.*" "C:\\Users\\Michael\\Desktop\\Tangram\\src\\**\\*.*")))
+
+#-:mswindows
+(setf (logical-pathname-translations "tangram")
+      '(("**;*.*" "/home/mwessel/tangram/src/**/*.*")))
+
+;;;
+;;;
+;;;
+
+(require "clim") 
+
+(load "tangram:define-system.lisp")
+
+;;;
+;;;
+;;;
 
 (define-system tangram-aux 
   (:default-pathname "tangram:tools;")
@@ -37,10 +56,21 @@
 
 (define-system tangram
     (:default-pathname "tangram:")
-  (:serial "tangram-packages"
-   ; "tangram-templates"
+    (:serial "tangram-packages"
+   #+:linux
+   "tangram-templates"
    tangram-aux tangram-persistence tangram-geometry
    tangram-main tangram-gui))
+
+;;;
+;;;
+;;;
+
+;(compile-system "tangram")
+
+;(load-system "tangram")
+
+;(tangram::tangram)
 
 
 
