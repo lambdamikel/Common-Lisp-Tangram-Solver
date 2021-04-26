@@ -2,13 +2,8 @@
  
 (in-package :cl-user)
 
-#+:mswindows
 (setf (logical-pathname-translations "tangram")
-      '(("**;*.*" "C:\\Users\\Michael\\Desktop\\Tangram\\src\\**\\*.*")))
-
-#-:mswindows
-(setf (logical-pathname-translations "tangram")
-      '(("**;*.*" "/home/mwessel/tangram/src/**/*.*")))
+      '(("**;*.*" "C:\\Users\\Michael\\Desktop\\GIT\\Common-Lisp-Tangram-Solver\\src\\**\\*.*")))
 
 ;;;
 ;;;
@@ -66,11 +61,10 @@
 ;;;
 ;;;
 
-;(compile-system "tangram")
+(compile-system "tangram" :force-p t)
 
-;(load-system "tangram")
+(load-system "tangram")
 
-;(tangram::tangram)
 
 
 

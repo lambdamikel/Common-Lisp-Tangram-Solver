@@ -332,6 +332,37 @@
    :affected-by-matrix-p nil 
    :bounding-box-p nil))
 
+
+#| 
+int pnpoly(int nvert, float *vertx, float *verty, float testx, float testy)
+{
+  int i, j, c = 0;
+  for (i = 0, j = nvert-1; i < nvert; j = i++) {
+    if ( ((verty[i]>testy) != (verty[j]>testy)) &&
+     (testx < (vertx[j]-vertx[i]) * (testy-verty[i]) / (verty[j]-verty[i]) + vertx[i]) )
+       c = !c;
+  }
+  return c;
+}
+|# 
+#| 
+
+(defun-memo count-intersections* (x y polygon)
+    ((x y polygon (trafo-id *matrix*)))
+  (let* ((points (t-list polygon))
+         (count 0))
+    (dolist (point points) 
+      (if (not (eq (> ( y point)  y)
+
+
+((verty[i]>testy) != (verty[j]>testy)) &&
+     (testx < (vertx[j]-vertx[i]) * (testy-verty[i]) / (verty[j]-verty[i]) + vertx[i]) )
+       c = !c;
+
+
+|# 
+
+
 (defun-memo count-intersections* (x y polygon)
     ((x y polygon (trafo-id *matrix*)))
   (let* ((points (point-list polygon))
@@ -346,7 +377,7 @@
      (y (p1 *test-beam*)) y
 	
      (x (p2 *test-beam*)) +big-int+
-     (y (p2 *test-beam*)) y)
+     (y (p2 *test-beam*)) +big-int2+)
       
     (loop until (eq mark-point 'stop)
 		
@@ -396,8 +427,6 @@
 		     (setf flag nil)	     
 		     (setf from-point cur-point))))))
     count))
-
-
 
 (defun count-intersections (point polygon)
   (count-intersections* (x point) (y point) polygon))
@@ -509,14 +538,15 @@
 
 (defun-memo one-part-is-inside-p* (x1 y1 x2 y2 poly delta)
     ((x1 y1 x2 y2 poly (trafo-id *matrix*)))
-  (let ((xm (/ (+ x1 x2) 2))
-        (ym (/ (+ y1 y2) 2)))
-      (or (inside-p* xm ym poly)
-          (unless (< (+ (expt (- x1 x2) 2)
-                        (expt (- y1 y2) 2))
-                     delta)
-            (or (one-part-is-inside-p* x1 y1 xm ym poly delta)
-                (one-part-is-inside-p* xm ym x2 y2 poly delta))))))
+  (let ((xm (float (/ (+ x1 x2) 2)))
+        (ym (float (/ (+ y1 y2) 2))))
+    ;; BUG IN LISPWORKS!!!!! WITH RATIOS IT DOESN'T WORK - WRONG VALUE ON STACK!!!!
+    (or (inside-p* xm ym poly)
+        (unless (< (+ (expt (- x1 x2) 2)
+                      (expt (- y1 y2) 2))
+                   delta)
+          (or (one-part-is-inside-p* x1 y1 xm ym poly delta)
+              (one-part-is-inside-p* xm ym x2 y2 poly delta))))))
 
 ;;;
 ;;; Hier zählt der Rand des Polygons *NICHT* als Äußeres!!! 

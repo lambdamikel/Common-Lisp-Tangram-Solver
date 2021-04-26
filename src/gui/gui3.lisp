@@ -1313,7 +1313,7 @@
       (setf (display-view frame) 'problem)			   
       (refresh-display)
       (find-covering (polygons (current-problem frame))
-                     (tiles (current-problem frame))
+                     (reverse (tiles (current-problem frame)))
                      :frame frame
                      :all-solutions-p (all-solutions-p frame)
                      :remove-used-tiles-p (member (game-type frame) '(less all))

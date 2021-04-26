@@ -10,9 +10,8 @@
      (sqrt (tangram-geometry::calculate-area poly)))))
 
 (defun polygon-difference (x y)	;;; "x minus y"
-  (if (not (eq (calculate-rcc-relation x y) :tppi))
+  (if (not (member (calculate-rcc-relation x y) '(:tppi :ec)))
       (error "Bad polygons!")
-
     
     (let* ((points-of-y-on-x 
             (remove-if-not #'(lambda (point-of-y)
@@ -250,7 +249,7 @@
 ;;;
 ;;;
 
-(defun find-possible-alignments (a b &key how-many frame color)
+(defun find-possible-alignments (a b &key  how-many frame color score-p rem-tile-types)
   ;;; versuche "b" in "a" unterzubringen! 
 
   (let ((res nil)
@@ -293,46 +292,89 @@
 		    (show-polygons (list b)
 				   :clear-p nil
 				   :inks (list +flipping-ink+)
-				   :filled-p nil)
-                    #+:ignore
-                    (sleep 1) )
-		  
+				   :filled-p nil))
+
                   (let* ((rel (calculate-rcc-relation a b)))
-                    		    
+                
                     (when *debug-p* 
+                                                          
                       (let ((aa (poly-from-xy-list 
-                                 (append (mapcar #'get-xy-list 
-                                                 (mapcar #'p1 (segments a)))
-                                         (list (get-xy-list (p2 (first (last (segments a)))))))
-                                 :affected-by-matrix-p nil))
+                                        (append (mapcar #'get-xy-list 
+                                                        (mapcar #'p1 (segments a)))
+                                                (list (get-xy-list (p2 (first (last (segments a)))))))
+                                        :affected-by-matrix-p nil))
 			    
                             (bb (poly-from-xy-list 
-                                 (append (mapcar #'get-xy-list 
-                                                 (mapcar #'p1 (segments b)))
-                                         (list (get-xy-list (p2 (first (last (segments b)))))))
-                                 :affected-by-matrix-p nil)))
-
-                        (push (list aa bb color) *x*)))	
+                                        (append (mapcar #'get-xy-list 
+                                                        (mapcar #'p1 (segments b)))
+                                                (list (get-xy-list (p2 (first (last (segments b)))))))
+                                        :affected-by-matrix-p nil)))
+                        
+                        (setf *x* (list rel aa bb color))))
 
                     (case rel
-                      (:tppi 
-                       (push (list (polygon-difference a b)
-                                   (poly-from-xy-list 
-                                    (append (mapcar #'get-xy-list 
-                                                    (mapcar #'p1 (segments b)))
-                                            (list (get-xy-list (p2 (first (last (segments b)))))))
-                                    :affected-by-matrix-p nil))
-			     
-                             res)
-		       (when (and frame (show-thinking-p frame))
-			 (show-polygons (list b)
+
+                      ((:tppi)
+
+                       (let* ((succ-conf (polygon-difference a b))
+                              (aligned-poly (poly-from-xy-list 
+                                             (append (mapcar #'get-xy-list 
+                                                             (mapcar #'p1 (segments b)))
+                                                     (list (get-xy-list (p2 (first (last (segments b)))))))
+                                             :affected-by-matrix-p nil))
+                              (h (if score-p 
+                                     (alignment-result-heuristic-for-polygon 
+                                      aligned-poly 
+                                      succ-conf
+                                      a
+                                      rem-tile-types)
+                                   0)))
+
+                         (unless (eq h :bad)
+                           (push (list h
+                                       aligned-poly 
+                                       succ-conf
+                                       a
+                                       rem-tile-types)
+                                 res))
+                       
+                         (when *debug-p* 
+                           (let ((x
+                                  (count-if #'(lambda (p) 
+                                                (inside-p p a))
+                                            (point-list b))))                             
+                             (when (zerop x)
+                               (show-polygons (append succ-conf (list aligned-poly))
+                                              :clear-p t
+                                              :inks (append (loop as x in succ-conf collect +blue+) (list +yellow+))
+                                              :filled-p t)
+                               (sleep 0.3)))))
+                                                  
+                       (when (and frame (show-thinking-p frame))
+                         (show-polygons (list b)
 					:clear-p nil
 					:inks (list +flipping-ink+)
 					:filled-p nil))
+                       
                        (when (and how-many (> (length res) how-many))
                          (return-from enumerate)))
 
                       (:eq 
+                       
+                       (let* ((succ-conf :match)
+                              (aligned-poly (poly-from-xy-list 
+                                             (append (mapcar #'get-xy-list 
+                                                             (mapcar #'p1 (segments b)))
+                                                     (list (get-xy-list (p2 (first (last (segments b)))))))
+                                             :affected-by-matrix-p nil))
+                              (h (if score-p 
+                                     (alignment-result-heuristic-for-polygon 
+                                      aligned-poly 
+                                      succ-conf
+                                      a
+                                      rem-tile-types)
+                                   0)))
+
 		       (when (and frame (show-thinking-p frame))
 			 (show-polygons (list b)
 					:clear-p nil
@@ -341,16 +383,14 @@
 
 		       (return-from find-possible-alignments
                          (prog1 
-                             (list (list :match 
-                                         (poly-from-xy-list 
-                                          (append
-                                           (mapcar #'get-xy-list 
-                                                   (mapcar #'p1 (segments b)))
-                                           (list (get-xy-list (p2 (first (last (segments b)))))))
-                                          :affected-by-matrix-p nil)))
-
+                             (list 
+                              (list h 
+                                    aligned-poly 
+                                    succ-conf
+                                    a
+                                    rem-tile-types))
                            (setf (affected-by-matrix-p a) abma)
-                           (setf (affected-by-matrix-p b) abmb))))
+                           (setf (affected-by-matrix-p b) abmb)))))
                                             
 		      (otherwise 
 		       (when (and frame (show-thinking-p frame))
@@ -364,7 +404,7 @@
 
     (if *remove-congruent-configurations-p*         
         (remove-duplicates res
-                           :key #'first 
+                           :key #'third
                            :test #'(lambda (x y)
                                      (set-equal x y 
                                                 :test #'congruent-p)))
@@ -376,7 +416,6 @@
 ;;;
 ;;;
 
-
 (defun history (n)
   (show-polygons (nth n *x*) :inks (list (first +gray-colors+)
 					 (third (nth n *x*)))))
@@ -385,6 +424,13 @@
 ;;;
 ;;;
 
+(defun tuple-> (a b) 
+  (when (and a b)
+    (cond ((> (first a) (first b))
+           t)
+          ((= (first a) (first b))
+           (tuple-> (rest a) (rest b)))
+          (t nil))))
 
 (defun find-covering (polygon-set tile-types &key (remove-used-tiles-p t)
                                   frame 
@@ -409,7 +455,6 @@
 
                       (unless all-solutions-p 
                         (return-from do-it nil)))
-
 		       
                      (t 
 			
@@ -418,44 +463,42 @@
                       #+:ignore 
                       (sleep 1) 
 
-                      (let* ((alignments nil))
+                      (let* ((alignments nil)
+                             (perfect-alignments nil))
 			                          
                         (dolist (polygon polygons)
                           (dolist (tile-type tile-types) ; tile-type is the set of "mirrored" versions of that tile! defined by means of the "mirror values" for the tile 
-                            (dolist (tile tile-type)
-                              (when t #+:ignore 
-                                (<=  (tangram-geometry::calculate-area (shape tile))
-                                         (tangram-geometry::calculate-area polygon))
-
-                                (dolist (alignment
+                            (let ((rem-tile-types 
+                                   (if remove-used-tiles-p 
+                                       (remove tile-type tile-types)
+                                     tile-types)))
+                              (dolist (tile tile-type)
+                                (dolist (succ-conf 
                                          (find-possible-alignments polygon (shape tile)
-                                                                   :frame frame :color (color tile)))
-                                  (let ((h                                   
-                                         (alignment-result-heuristic-for-polygon alignment polygon)))
-
-                                    (push (list h polygon tile tile-type alignment) 
-                                          alignments)))))))
-
-                        (let ((sorted (subseq (sort alignments #'> :key #'first) 0 (min 100 (length alignments)))))
-                          (loop as (h polygon tile tile-type alignment) in sorted do        
-                                  (let* (
-                                         ;; note - if one mirrored version of a tile is used from the tile-type, then we cannot use any other mirrored version
-                                         ;; hence, if reuse it not permitted, remove the ENTIRE tile type as one of its variants was used 
-                                         ;; the actual tiles doesn't matter hence! only the tile-type! 
-                                         (new-tile-types (remove tile-type tile-types))
-                                         (rem-polygons (remove polygon polygons))
-                                      
-                                         (polygon-set (first alignment))
-                                         (aligned-polygon (second alignment)))
-                                              
-                                    (when polygon-set                                 
-                                      (do-it (if (eq polygon-set :match)
-                                                 rem-polygons 
-                                               (append rem-polygons polygon-set))
-                                             (if remove-used-tiles-p 
-                                                 new-tile-types
-                                               tile-types)
-                                             (cons (list aligned-polygon tile) history)))))))))))
+                                                                       :frame frame 
+                                                                       :color (color tile)
+                                                                       :score-p t
+                                                                       :rem-tile-types rem-tile-types))
+                                  ;; succ-conf = (list h aligned-poly succ-conf orig-poly rem-tile-types)
+                                  (if (eq (third succ-conf) :match)
+                                      (push (list succ-conf tile ) perfect-alignments)
+                                    (push (list succ-conf tile ) alignments)))))))
+                        
+                        (let ((sorted (append (sort perfect-alignments #'tuple-> :key #'caar)
+                                              (subseq (sort alignments #'tuple-> :key #'caar) 
+                                                      ;; best n only ? 
+                                                      0 
+                                                      ;; (min 4 (length alignments))
+                                                      (length alignments)
+                                                      ))))
+                          
+                          (loop as ((h aligned-poly succ-conf orig-poly rem-tile-types) tile) in sorted do        
+                                (let* ((rem-polygons (remove orig-poly polygons)))
+                                  (do-it (if (eq succ-conf :match)
+                                             rem-polygons 
+                                           (append succ-conf rem-polygons   ))
+                                         rem-tile-types
+                                         (cons (list aligned-poly tile) history))))))))))
       
       (do-it polygon-set tile-types nil)
       
@@ -466,38 +509,28 @@
 ;;;
 ;;;
 
-(defun alignment-result-heuristic-for-polygon (conf orig-polygon)
-  (let* ((remaining-polygon-set (first conf))         
-         (aligned-polygon (second conf))
-         ;(rem-area (reduce #'+ (mapcar #'tangram-geometry::calculate-area remaining-polygon-set)))
-         (h
-          (if (symbolp remaining-polygon-set) ; :match! 
-              (return-from alignment-result-heuristic-for-polygon 100000)
-            (apply #'+
-                   (mapcar #'compactness
-                           remaining-polygon-set))))
-         (count 0))
+(defun alignment-result-heuristic-for-polygon (aligned-polygon conf orig-polygon rem-tile-types)
+  (cond ((symbolp conf) ; :match! 
+        
+         (list (tangram-geometry::calculate-area aligned-polygon) 0))
 
-    (loop as s in (segments aligned-polygon) do
-          (when (lies-on-p s orig-polygon)
-            (incf count (length-of-line s))))
+        ((some #'(lambda (poly) 
+                   (every #'(lambda (tile-type)                                 
+                              (let ((tile (first tile-type))) ; use first reflected variant 
+                                (< (+ (tangram-geometry::calculate-area poly) 2) ;; account for inaccuracies... hack 
+                                   (tangram-geometry::calculate-area (shape tile)))))
+                          rem-tile-types))
+               conf)
+         :bad )
 
-    (* (1+ count) h)))
+        (t 
 
+         ;; score list for lexicographic tuple->-p sorting 
 
-#+:ignore
-(defun alignment-result-heuristic-for-polygon (conf orig-polygon)
-  ;; determine which successor conf to determine next
-  (let* ((remaining-polygon-set (first conf))         
-         (aligned-polygon (second conf))
-         (rem-area (reduce #'+ (mapcar #'tangram-geometry::calculate-area remaining-polygon-set)))
-         (h
-          (- (apply #'+
-                    (mapcar #'compactness
-                            remaining-polygon-set)))))
-    ; rem-area
-    h
-    ))
-
-
-
+         (list              
+          (tangram-geometry::calculate-area aligned-polygon)                
+          (- (count-if #'(lambda (p) 
+                           (inside-p p orig-polygon))
+                       (point-list aligned-polygon)))
+          (apply #'min (mapcar #'(lambda (x) (- (compactness x))) conf))
+          (- (reduce #'+ (mapcar #'length (mapcar #'segments conf))))))))

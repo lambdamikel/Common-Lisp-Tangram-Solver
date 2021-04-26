@@ -28,12 +28,20 @@ following problem:
 ![thinking](pics/showthinking.png)
 ![solutions](pics/editor.jpg)
 
-AFAIK, this is the only Tangram solver in existence (there are very
-few out there!) that is capable of solving arbitary geometric tiling
-problems purely by means of geometric search / computational
-geometry.
+The solver uses geometric search: 
 
 ![search](pics/search.jpg)
+
+This is work in progress. The heuristics are being changed from time
+to time. Currently, with the above machine configuration, it takes
+about ~10 minutes for it to solve the standard Tangram problem:
+
+![Standard Solution 1](src/problems/standard1.jpg)
+![Standard Solution 2](src/problems/standard2.jpg) 
+
+ Other problems are much faster. The solver frequently finds
+innovative solutions. Problems in `.tan` format are
+[`src/problems`](./src/problems) folder. 
 
 ## History 
 

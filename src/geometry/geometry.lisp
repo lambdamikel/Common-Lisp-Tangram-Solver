@@ -83,6 +83,7 @@
 ;;;
 
 (defconstant +big-int+ 10000)
+(defconstant +big-int2+ 9000)
 
 (defparameter *matrix* nil)
 
@@ -1655,6 +1656,21 @@
 
 (defmethod get-xy-list ((obj geom-chain-or-polygon))
   (mapcar #'get-xy-list (segments obj)))
+
+;;;
+;;;
+;;;
+
+(defmethod get-float-xy-list ((point geom-point))
+  (list (float (x point)) '= (x point) (float (y point)) '= (y point)))
+
+
+(defmethod get-float-xy-list ((line geom-line))
+  (mapcar #'get-float-xy-list (point-list line)))
+
+(defmethod get-float-xy-list ((obj geom-chain-or-polygon))
+  (mapcar #'get-float-xy-list (segments obj)))
+
 
 ;;;
 ;;;
