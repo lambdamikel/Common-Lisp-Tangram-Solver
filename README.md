@@ -34,7 +34,10 @@ The solver uses geometric search:
 
 This is work in progress. The heuristics are being changed from time
 to time. Currently, with the above machine configuration, it takes
-about ~10 minutes for it to solve the standard Tangram problem:
+about ~3 minutes and 50 seconds for it to solve the standard Tangram problem
+if "Show Thinking" is unchecked, and ~6 minutes and 30 seconds with 
+"Show Thinking" enabled: 
+
 
 ![Standard Solution 1](src/problems/standard1.jpg)
 ![Standard Solution 2](src/problems/standard2.jpg) 
