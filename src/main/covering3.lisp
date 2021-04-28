@@ -432,6 +432,11 @@
            (tuple-> (rest a) (rest b)))
           (t nil))))
 
+#+:ignore
+(defun reset-statistics () 
+  (setf *inc-counter* 0)
+  (setf *statistics* nil))
+
 (defun find-covering (polygon-set tile-types &key (remove-used-tiles-p t)
                                   frame 
                                   all-solutions-p                                  
@@ -447,14 +452,20 @@
 
              (do-it (polygons tile-types history)
                  
+               #+:ignore
+               (incf *inc-counter*) 
+
                (cond ((goal-p polygons tile-types) 
 
-                      (push (list polygons tile-types history) solutions)
+                      (push 
+                       (list polygons tile-types history) 
+                       solutions)
 
-                      (when show-thinking-fn (funcall show-thinking-fn polygons tile-types history t))
+                      (when show-thinking-fn 
+                        (funcall show-thinking-fn polygons tile-types history t))
 
                       (unless all-solutions-p 
-                        (return-from do-it nil)))
+                        (return-from find-covering solutions)))
 		       
                      (t 
 			
@@ -467,7 +478,7 @@
                              (perfect-alignments nil))
 			                          
                         (dolist (polygon polygons)
-                          (dolist (tile-type tile-types) ; tile-type is the set of "mirrored" versions of that tile! defined by means of the "mirror values" for the tile 
+                          (dolist (tile-type tile-types) ; tile-type is the set of reflected variants of that tile
                             (let ((rem-tile-types 
                                    (if remove-used-tiles-p 
                                        (remove tile-type tile-types)
@@ -483,14 +494,18 @@
                                   (if (eq (third succ-conf) :match)
                                       (push (list succ-conf tile ) perfect-alignments)
                                     (push (list succ-conf tile ) alignments)))))))
+
                         
                         (let ((sorted (append (sort perfect-alignments #'tuple-> :key #'caar)
-                                              (subseq (sort alignments #'tuple-> :key #'caar) 
+                                               (subseq (sort alignments #'tuple-> :key #'caar) 
                                                       ;; best n only ? 
                                                       0 
                                                       ;; (min 4 (length alignments))
                                                       (length alignments)
-                                                      ))))
+                                                      )))) 
+
+                          #+:ignore 
+                          (push (list *inc-counter* (length tile-types) (length sorted)) *statistics*)
                           
                           (loop as ((h aligned-poly succ-conf orig-poly rem-tile-types) tile) in sorted do        
                                 (let* ((rem-polygons (remove orig-poly polygons)))
@@ -534,3 +549,4 @@
                        (point-list aligned-polygon)))
           (apply #'min (mapcar #'(lambda (x) (- (compactness x))) conf))
           (- (reduce #'+ (mapcar #'length (mapcar #'segments conf))))))))
+
