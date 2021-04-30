@@ -2,6 +2,12 @@
 
 (in-package :tangram)
 
+(defparameter *record-statistics* nil)
+
+(defvar *bad-counter* 0)
+(defvar *inc-counter* 0)
+(defvar *statistics* nil)
+
 (defun compactness (poly)
   (with-no-matrix-at-all 
     (/ 
@@ -330,6 +336,9 @@
                                       rem-tile-types)
                                    0)))
 
+                         (when (and (eq h :bad) *record-statistics*)
+                           (incf *bad-counter*))
+
                          (unless (eq h :bad)
                            (push (list h
                                        aligned-poly 
@@ -338,7 +347,7 @@
                                        rem-tile-types)
                                  res))
                        
-                         (when *debug-p* 
+                         (when *debug-p*  
                            (let ((x
                                   (count-if #'(lambda (p) 
                                                 (inside-p p a))
@@ -348,7 +357,7 @@
                                               :clear-p t
                                               :inks (append (loop as x in succ-conf collect +blue+) (list +yellow+))
                                               :filled-p t)
-                               (sleep 0.3)))))
+                               (sleep 3)))))
                                                   
                        (when (and frame (show-thinking-p frame))
                          (show-polygons (list b)
@@ -432,8 +441,8 @@
            (tuple-> (rest a) (rest b)))
           (t nil))))
 
-#+:ignore
 (defun reset-statistics () 
+  (setf *bad-counter* 0)
   (setf *inc-counter* 0)
   (setf *statistics* nil))
 
@@ -452,8 +461,8 @@
 
              (do-it (polygons tile-types history)
                  
-               #+:ignore
-               (incf *inc-counter*) 
+               (when *record-statistics*
+                 (incf *inc-counter*))
 
                (cond ((goal-p polygons tile-types) 
 
@@ -478,7 +487,8 @@
                              (perfect-alignments nil))
 			                          
                         (dolist (polygon polygons)
-                          (dolist (tile-type tile-types) ; tile-type is the set of reflected variants of that tile
+                          (dolist (tile-type tile-types) 
+                            ;; tile-type is the set of reflected variants of that tile
                             (let ((rem-tile-types 
                                    (if remove-used-tiles-p 
                                        (remove tile-type tile-types)
@@ -499,13 +509,11 @@
                         (let ((sorted (append (sort perfect-alignments #'tuple-> :key #'caar)
                                                (subseq (sort alignments #'tuple-> :key #'caar) 
                                                       ;; best n only ? 
-                                                      0 
-                                                      ;; (min 4 (length alignments))
-                                                      (length alignments)
+                                                      0 (length alignments) 
                                                       )))) 
 
-                          #+:ignore 
-                          (push (list *inc-counter* (length tile-types) (length sorted)) *statistics*)
+                          (when *record-statistics*
+                            (push (list *inc-counter* (length tile-types) (length sorted)) *statistics*))
                           
                           (loop as ((h aligned-poly succ-conf orig-poly rem-tile-types) tile) in sorted do        
                                 (let* ((rem-polygons (remove orig-poly polygons)))
