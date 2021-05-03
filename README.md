@@ -11,7 +11,8 @@ with CLIM, on Windows, Linux, and Mac. I can only support Windows and
 Linux, but it is known to run on a M1 Silicon Mac as well (see below).
 
 Here is a [2003 poster about the project, in
-German](tangram-poster.pdf).
+German](tangram-poster.pdf), and here my [European Lisp Symposium '21
+paper.](tangram-paper.pdf), as well as the [slides.](tangram-talk.pdf). 
 
 ![poster](pics/poster.jpg)
 
