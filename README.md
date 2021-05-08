@@ -17,8 +17,8 @@ paper](tangram-paper.pdf), as well as the [slides of the talk.](tangram-talk.pdf
 ![poster](pics/poster.jpg)
 
 Pleae check out [the YouTube video to see it in
-action!](https://www.youtube.com/watch?v=UUn_np8I3zg), or try
-one of the supplied executables to run on your own machine! 
+action!](https://youtu.be/rnZzXUbuSi4), or try one of the supplied
+executables to run on your own machine!
 
 On my 2012 iCore 7 2.4 GZ 8 GB Ubuntu Xenial PC, thanks to its
 geometric search heuristics, it takes ~ 10 seconds to solve the
