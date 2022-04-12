@@ -48,6 +48,7 @@ innovative solutions. Problems in `.tan` format are
 [`src/problems`](./src/problems) folder.
 
 ![Ignat](./pics/house.png) 
+![Ignat 2](./pics/house2.png) 
 
 ## History 
 
