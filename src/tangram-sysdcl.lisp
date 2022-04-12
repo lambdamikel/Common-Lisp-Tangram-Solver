@@ -3,7 +3,7 @@
 (in-package :cl-user)
 
 (setf (logical-pathname-translations "tangram")
-      '(("**;*.*" "C:\\Users\\Michael\\Desktop\\GIT\\Common-Lisp-Tangram-Solver\\src\\**\\*.*")))
+      '(("**;*.*" "C:\\Users\\micha\\Desktop\\GIT\\Common-Lisp-Tangram-Solver\\src\\**\\*.*")))
 
 ;;;
 ;;;
@@ -43,7 +43,7 @@
 
 (define-system tangram-main
   (:default-pathname "tangram:main;")
-  (:serial tangram-aux tangram-persistence "covering3"))
+  (:serial tangram-aux tangram-persistence "covering4"))
 
 (define-system tangram-gui
   (:default-pathname "tangram:gui;")

@@ -6,7 +6,7 @@
 
 #+:mswindows
 (setf (logical-pathname-translations "tangram")
-      '(("**;*.*" "C:\\Users\\Michael\\Desktop\\Tangram\\src\\**\\*.*")))
+      '(("**;*.*" "C:\\Users\\micha\\Desktop\\GIT\\Common-Lisp-Tangram-Solver\\src\\**\\*.*")))
 
 #-:mswindows
 (setf (logical-pathname-translations "tangram")

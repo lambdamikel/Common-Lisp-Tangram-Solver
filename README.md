@@ -45,7 +45,9 @@ if "Show Thinking" is unchecked, and ~6 minutes and 30 seconds with
 
  Other problems are much faster. The solver frequently finds
 innovative solutions. Problems in `.tan` format are
-[`src/problems`](./src/problems) folder. 
+[`src/problems`](./src/problems) folder.
+
+![Ignat][./pics/house.png] 
 
 ## History 
 
