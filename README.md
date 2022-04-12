@@ -47,7 +47,7 @@ if "Show Thinking" is unchecked, and ~6 minutes and 30 seconds with
 innovative solutions. Problems in `.tan` format are
 [`src/problems`](./src/problems) folder.
 
-![Ignat][./pics/house.png] 
+![Ignat](./pics/house.png) 
 
 ## History 
 
