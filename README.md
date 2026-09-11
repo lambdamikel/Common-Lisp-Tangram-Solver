@@ -16,7 +16,7 @@ paper](tangram-paper.pdf), as well as the [slides of the talk.](tangram-talk.pdf
 
 ![poster](pics/poster.jpg)
 
-Pleae check out [the YouTube video to see it in
+Please check out [the YouTube video to see it in
 action!](https://youtu.be/rnZzXUbuSi4), or try one of the supplied
 executables to run on your own machine!
 
@@ -62,8 +62,8 @@ during his computer science master and PhD endeavors, from 1996 to
 
 ## Installation (Windows, Linux, Mac)
 
-You will need LisWorks (6.1, 7.1) with CLIM if you want to run it from
-source, or even build the application. Else, exectuables are provided
+You will need LispWorks (6.1, 7.1) with CLIM if you want to run it from
+source, or even build the application. Else, executables are provided
 for Linux32 and Windows (see below).
 
 On Linux, I needed to install a number of (in my case, 32bit) legacy
@@ -123,7 +123,7 @@ Linux.](https://twitter.com/RainerJoswig/status/1369401013308973060).
 
 Thanks to Rainer Joswig (`Lispm`) for checking it out with the new
 Silicon Macs and LispWorks 7.1 (I only have 6.1), for spreading the
-word, and for tipps regarding the application delivery process (FLI
+word, and for tips regarding the application delivery process (FLI
 template collection).
 
 Enjoy! 
